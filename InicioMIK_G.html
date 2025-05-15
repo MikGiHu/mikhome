@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Inicio Personalizada</title>
+    <style>
+        :root {
+            --primary-bg: #f4f7f6;
+            --secondary-bg: #ffffff;
+            --text-color: #333;
+            --accent-color: #007bff;
+            --border-color: #ddd;
+            --shadow-color: rgba(0,0,0,0.1);
+            --icon-size: 32px;
+            --item-min-width: 120px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 10px;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        header img#page-logo {
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        header h1#page-title {
+            font-size: 1.8em;
+            color: var(--accent-color);
+        }
+
+        section {
+            background-color: var(--secondary-bg);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Matriz de Accesos Rápidos */
+        #quick-access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--item-min-width), 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quick-link-item {
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: grab;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden; /* Para que el nombre no desborde mucho */
+        }
+
+        .quick-link-item:hover {
+            box-shadow: 0 4px 8px var(--shadow-color);
+            transform: translateY(-3px);
+        }
+
+        .quick-link-item img.favicon {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            margin-bottom: 8px;
+            object-fit: contain;
+        }
+
+        .quick-link-item a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.9em;
+            display: block; /* Para que el enlace ocupe todo el item */
+        }
+
+        .quick-link-item .link-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            max-width: 100%;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            line-height: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .quick-link-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: #cc0000;
+        }
+        
+        /* Inputs para añadir nuevos enlaces */
+        #add-link-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #add-link-form input[type="text"],
+        #add-link-form input[type="url"] {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            min-width: 150px; /* Para que no se hagan muy pequeños */
+        }
+
+        #add-link-form button {
+            padding: 8px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #add-link-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Motores de Búsqueda */
+        .search-forms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .search-form label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .search-form input[type="text"] {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px 0 0 4px;
+            flex-grow: 1;
+        }
+
+        .search-form button {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-form .input-group {
+            display: flex;
+        }
+
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Estilos para Drag & Drop */
+        .quick-link-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed var(--accent-color);
+        }
+        .quick-link-item.drag-over {
+            transform: scale(1.05);
+            border: 1px solid var(--accent-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            header img#page-logo {
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+            #add-link-form {
+                flex-direction: column;
+            }
+             #add-link-form input[type="text"],
+             #add-link-form input[type="url"],
+             #add-link-form button {
+                width: 100%;
+             }
+            .search-forms {
+                 grid-template-columns: 1fr; /* Una columna en móviles */
+            }
+        }
+         @media (max-width: 480px) {
+            :root {
+                --item-min-width: 100px; /* Más pequeños en móviles */
+                --icon-size: 28px;
+            }
+             header h1#page-title {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="page-title">Mi Portal Personalizado</h1>
+        </header>
+
+        <section id="quick-access">
+            <h2>Accesos Rápidos</h2>
+            <div id="add-link-form">
+                <input type="text" id="new-link-name" placeholder="Nombre del sitio" required>
+                <input type="url" id="new-link-url" placeholder="https://ejemplo.com" required>
+                <button id="add-link-btn">Añadir Acceso</button>
+            </div>
+            <div id="quick-access-grid">
+                </div>
+        </section>
+
+        <section id="search-engines">
+            <h2>Motores de Búsqueda</h2>
+            <div class="search-forms">
+                <form class="search-form" action="https://www.startpage.com/sp/search" method="get" target="_blank">
+                    <label for="startpage-query">Startpage</label>
+                    <div class="input-group">
+                        <input type="text" name="query" id="startpage-query" placeholder="Buscar en Startpage...">
+                        <button type="submit">Buscar</button>
+                    </div>
+                    <input type="hidden" name="cat" value="web">
+                    <input type="hidden" name="cmd" value="process_search">
+                    <input type="hidden" name="enginecount" value="1">
+                    <input type="hidden" name="language" value="espanol"> </form>
+
+                <form class="search-form" action="https://www.google.com/search" method="get" target="_blank">
+                    <label for="google-query">Google</label>
+                    <div class="input-group">
+                        <input type="text" name="q" id="google-query" placeholder="Buscar en Google...">
+                        <button type="submit">Buscar</button>
+                    </div>
+                </form>
+                
+                <form class="search-form" action="https://chat.openai.com/" method="get" target="_blank">
+                     <label for="chatgpt-query">ChatGPT</label>
+                    <div class="input-group">
+                        <input type="text" id="chatgpt-query" placeholder="Ir a ChatGPT (escribe aquí para recordar)">
+                        <button type="submit">Abrir ChatGPT</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const quickAccessGrid = document.getElementById('quick-access-grid');
+            const addLinkBtn = document.getElementById('add-link-btn');
+            const newLinkNameInput = document.getElementById('new-link-name');
+            const newLinkUrlInput = document.getElementById('new-link-url');
+
+            const initialLinks = [
+                { name: "Gmail", url: "https://mail.google.com" },
+                { name: "YouTube", url: "https://www.youtube.com" },
+                { name: "Keep", url: "https://keep.google.com" },
+                { name: "Google Fotos", url: "https://photos.google.com" },
+                { name: "Google Maps", url: "https://maps.google.com" },
+                { name: "Outlook", url: "https://outlook.live.com" },
+                { name: "Amazon.es", url: "https://www.amazon.es" },
+                { name: "AliExpress", url: "https://www.aliexpress.com" },
+                { name: "Lidl", url: "https://www.lidl.es" },
+                { name: "Aldi", url: "https://www.aldi.es" },
+                { name: "ChatGPT", url: "https://chat.openai.com" },
+                { name: "Gemini", url: "https://gemini.google.com" },
+                { name: "AI Studio", url: "https://aistudio.google.com" },
+                { name: "NotebookLM", url: "https://notebooklm.google.com" },
+                { name: "Hugging Face", url: "https://huggingface.co" },
+                { name: "Glasp", url: "https://glasp.co" },
+                { name: "Whisper Web", url: "https://huggingface.co/spaces/Xenova/whisper-web" },
+                { name: "Perplexity (Deedseek)", url: "https://www.perplexity.ai/" },
+                { name: "Mistral Chat", url: "https://chat.mistral.ai" },
+                { name: "The Objective", url: "https://theobjective.com" },
+                { name: "Vozpópuli", url: "https://www.vozpopuli.com" },
+                { name: "Hussars", url: "https://hussars.net" },
+                { name: "FilmAffinity", url: "https://www.filmaffinity.com" }
+            ];
+
+            let links = loadLinks();
+
+            function getFaviconUrl(url) {
+                try {
+                    const domain = new URL(url).hostname;
+                    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                } catch (e) {
+                    console.warn("URL inválida para favicon:", url);
+                    return 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>';
+                }
+            }
+
+            function renderLinks() {
+                quickAccessGrid.innerHTML = '';
+                links.forEach((link, index) => {
+                    const item = document.createElement('div');
+                    item.classList.add('quick-link-item');
+                    item.setAttribute('draggable', true);
+                    item.dataset.id = index;
+
+                    const favicon = document.createElement('img');
+                    favicon.classList.add('favicon');
+                    favicon.src = getFaviconUrl(link.url);
+                    favicon.alt = `${link.name} Favicon`;
+                    favicon.onerror = () => { 
+                        favicon.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>';
+                        favicon.alt = 'Icono genérico';
+                    };
+
+                    const linkElement = document.createElement('a');
+                    linkElement.href = link.url;
+                    linkElement.target = "_blank"; 
+                    
+                    const nameElement = document.createElement('span');
+                    nameElement.classList.add('link-name');
+                    nameElement.textContent = link.name;
+                    
+                    linkElement.appendChild(favicon);
+                    linkElement.appendChild(nameElement);
+                    item.appendChild(linkElement);
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.title = `Eliminar ${link.name}`;
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        deleteLink(index);
+                    });
+
+                    item.appendChild(deleteBtn);
+                    quickAccessGrid.appendChild(item);
+                });
+                addDragAndDropListeners();
+            }
+
+            function saveLinks() {
+                localStorage.setItem('customHomepageLinks', JSON.stringify(links));
+            }
+
+            function loadLinks() {
+                const savedLinks = localStorage.getItem('customHomepageLinks');
+                if (savedLinks) {
+                    return JSON.parse(savedLinks);
+                } else {
+                    return [...initialLinks];
+                }
+            }
+
+            function addLink() {
+                const name = newLinkNameInput.value.trim();
+                const url = newLinkUrlInput.value.trim();
+
+                if (name && url) {
+                    if (!url.match(/^https?:\/\/.+/)) {
+                        alert("Por favor, introduce una URL válida (ej: https://ejemplo.com)");
+                        newLinkUrlInput.focus();
+                        return;
+                    }
+                    links.push({ name, url });
+                    newLinkNameInput.value = '';
+                    newLinkUrlInput.value = '';
+                    saveLinks();
+                    renderLinks();
+                } else {
+                    alert("Por favor, rellena el nombre y la URL.");
+                }
+            }
+            
+            addLinkBtn.addEventListener('click', addLink);
+            newLinkUrlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addLink();
+                }
+            });
+
+            function deleteLink(index) {
+                if (confirm(`¿Seguro que quieres eliminar "${links[index].name}"?`)) {
+                    links.splice(index, 1);
+                    saveLinks();
+                    renderLinks();
+                }
+            }
+
+            let draggedItem = null;
+            let draggedItemIndex = null;
+
+            function addDragAndDropListeners() {
+                const items = quickAccessGrid.querySelectorAll('.quick-link-item');
+                items.forEach(item => {
+                    item.addEventListener('dragstart', handleDragStart);
+                    item.addEventListener('dragover', handleDragOver);
+                    item.addEventListener('dragleave', handleDragLeave);
+                    item.addEventListener('drop', handleDrop);
+                    item.addEventListener('dragend', handleDragEnd);
+                });
+            }
+
+            function handleDragStart(e) {
+                draggedItem = this;
+                draggedItemIndex = parseInt(this.dataset.id);
+                e.dataTransfer.effectAllowed = 'move';
+                setTimeout(() => {
+                    this.classList.add('dragging');
+                }, 0);
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault(); 
+                e.dataTransfer.dropEffect = 'move';
+                if (this !== draggedItem) {
+                    this.classList.add('drag-over');
+                }
+                return false;
+            }
+            
+            function handleDragLeave(e) {
+                this.classList.remove('drag-over');
+            }
+
+            function handleDrop(e) {
+                e.stopPropagation(); 
+                this.classList.remove('drag-over');
+
+                if (draggedItem !== this) {
+                    const targetIndex = parseInt(this.dataset.id);
+                    const itemToMove = links.splice(draggedItemIndex, 1)[0]; 
+                    links.splice(targetIndex, 0, itemToMove); 
+                    
+                    saveLinks();
+                    renderLinks(); 
+                }
+                return false;
+            }
+
+            function handleDragEnd(e) {
+                this.classList.remove('dragging');
+                quickAccessGrid.querySelectorAll('.quick-link-item').forEach(item => {
+                    item.classList.remove('drag-over');
+                });
+                draggedItem = null;
+                draggedItemIndex = null;
+            }
+
+            renderLinks();
+        });
+    </script>
+</body>
+</html>
